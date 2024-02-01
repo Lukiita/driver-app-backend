@@ -1,0 +1,32 @@
+{
+  "name": "clean-arch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "commit": "cz"
+  },
+  "keywords": [],
+  "author": "Lucas Fernandes Lima",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jest": "^29.5.11",
+    "crypto": "^1.0.1",
+    "jest": "^29.7.0",
+    "pg-promise": "^11.5.4",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.15",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
