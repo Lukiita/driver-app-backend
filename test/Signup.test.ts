@@ -1,5 +1,15 @@
-import { getAccount } from '../src/getAccount';
-import { signup } from '../src/signup';
+import { AccountDAOInMemory } from '../src/AccountDAO';
+import { GetAccount } from '../src/GetAccount';
+import { Signup } from '../src/Signup';
+
+let signup: Signup;
+let getAccount: GetAccount;
+
+beforeEach(() => {
+  const accountDAO = new AccountDAOInMemory();
+  signup = new Signup(accountDAO);
+  getAccount = new GetAccount(accountDAO);
+})
 
 test("Deve criar a conta de um passageiro", async function () {
   // given
@@ -10,11 +20,10 @@ test("Deve criar a conta de um passageiro", async function () {
     isPassenger: true,
   }
   // when
-  const outputSignup = await signup(input);
+  const outputSignup = await signup.execute(input);
   // then
   expect(outputSignup.accountId).toBeDefined();
-
-  const outputGetAccount = await getAccount(outputSignup.accountId);
+  const outputGetAccount = await getAccount.execute(outputSignup.accountId);
   expect(outputGetAccount.name).toBe(input.name);
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
@@ -31,11 +40,10 @@ test("Deve criar a conta de motorista", async function () {
     isDriver: true,
   }
   // when
-  const outputSignup = await signup(input);
+  const outputSignup = await signup.execute(input);
   // then
   expect(outputSignup.accountId).toBeDefined();
-
-  const outputGetAccount = await getAccount(outputSignup.accountId);
+  const outputGetAccount = await getAccount.execute(outputSignup.accountId);
   expect(outputGetAccount.name).toBe(input.name);
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
@@ -51,7 +59,7 @@ test("Não deve criar um passageiro se o nome for inválido", async function () 
     isPassenger: true,
   }
   // when
-  await expect(() => signup(input)).rejects.toThrow(new Error('Invalid name'));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error('Invalid name'));
 });
 
 test("Não deve criar um passageiro se o email for inválido", async function () {
@@ -63,7 +71,7 @@ test("Não deve criar um passageiro se o email for inválido", async function ()
     isPassenger: true,
   }
   // when
-  await expect(() => signup(input)).rejects.toThrow(new Error('Invalid email'));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error('Invalid email'));
 });
 
 test("Não deve criar um passageiro se o CPF for inválido", async function () {
@@ -75,7 +83,7 @@ test("Não deve criar um passageiro se o CPF for inválido", async function () {
     isPassenger: true,
   }
   // when
-  await expect(() => signup(input)).rejects.toThrow(new Error('Invalid CPF'));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error('Invalid CPF'));
 });
 
 test("Não deve criar um passageiro se a conta já existe", async function () {
@@ -87,8 +95,8 @@ test("Não deve criar um passageiro se a conta já existe", async function () {
     isPassenger: true,
   }
   // when
-  await signup(input);
-  await expect(() => signup(input)).rejects.toThrow(new Error('Account already exists'));
+  await signup.execute(input);
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error('Account already exists'));
 });
 
 test("Não deve criar um motorista se a placa for inválida", async function () {
@@ -101,5 +109,5 @@ test("Não deve criar um motorista se a placa for inválida", async function () 
     isDriver: true,
   }
   // when
-  await expect(() => signup(input)).rejects.toThrow(new Error('Invalid car plate'));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error('Invalid car plate'));
 });
