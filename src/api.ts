@@ -34,7 +34,8 @@ app.post('/request_ride', async (req, res) => {
 
 app.get('/rides/:rideId', async (req, res) => {
   const rideRepository = new RideRepositoryDatabase();
-  const signup = new GetRide(rideRepository);
+  const accountRepository = new AccountRepostioryDatabase();
+  const signup = new GetRide(rideRepository, accountRepository);
   const output = await signup.execute(req.params.rideId);
   res.json(output);
 });

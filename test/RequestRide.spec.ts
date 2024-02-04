@@ -9,11 +9,11 @@ let getRide: GetRide;
 let signup: Signup;
 
 beforeEach(() => {
-  const accountDAO = new AccountRepostioryDatabase();
-  const rideDao = new RideRepositoryDatabase();
-  requestRide = new RequestRide(rideDao, accountDAO);
-  signup = new Signup(accountDAO);
-  getRide = new GetRide(rideDao);
+  const accountRepository = new AccountRepostioryDatabase();
+  const rideRepository = new RideRepositoryDatabase();
+  requestRide = new RequestRide(rideRepository, accountRepository);
+  signup = new Signup(accountRepository);
+  getRide = new GetRide(rideRepository, accountRepository);
 });
 
 test('Não deve solicitar a corrida se o usuário não for um passageiro', async () => {
