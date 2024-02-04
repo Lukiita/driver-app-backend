@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import { AccountDAOInMemory } from '../src/AccountDAO';
+import { AccountRepostioryDatabase } from '../src/AccountRepository';
 import { GetAccount } from '../src/GetAccount';
 import MailerGateway from '../src/MailerGateway';
 import { Signup } from '../src/Signup';
@@ -8,9 +8,9 @@ let signup: Signup;
 let getAccount: GetAccount;
 
 beforeEach(() => {
-  const accountDAO = new AccountDAOInMemory();
-  signup = new Signup(accountDAO);
-  getAccount = new GetAccount(accountDAO);
+  const accountRepository = new AccountRepostioryDatabase();
+  signup = new Signup(accountRepository);
+  getAccount = new GetAccount(accountRepository);
 })
 
 test("Deve criar a conta de um passageiro", async function () {
@@ -29,7 +29,7 @@ test("Deve criar a conta de um passageiro", async function () {
   expect(outputGetAccount.name).toBe(input.name);
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
-  expect(outputGetAccount.is_passenger).toBe(input.isPassenger);
+  expect(outputGetAccount.isPassenger).toBe(input.isPassenger);
 });
 
 test("Deve criar a conta de motorista", async function () {
@@ -49,7 +49,7 @@ test("Deve criar a conta de motorista", async function () {
   expect(outputGetAccount.name).toBe(input.name);
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
-  expect(outputGetAccount.is_driver).toBe(input.isDriver);
+  expect(outputGetAccount.isDriver).toBe(input.isDriver);
 });
 
 test("Não deve criar um passageiro se o nome for inválido", async function () {
@@ -121,9 +121,9 @@ test("Deve criar a conta de um passageiro stub", async function () {
     cpf: "97456321558",
     isPassenger: true
   };
-  const saveStub = sinon.stub(AccountDAOInMemory.prototype, "save").resolves();
-  const getByEmailStub = sinon.stub(AccountDAOInMemory.prototype, "getByEmail").resolves();
-  const getByIdStub = sinon.stub(AccountDAOInMemory.prototype, "getById").resolves(input);
+  const saveStub = sinon.stub(AccountRepostioryDatabase.prototype, "save").resolves();
+  const getByEmailStub = sinon.stub(AccountRepostioryDatabase.prototype, "getByEmail").resolves();
+  const getByIdStub = sinon.stub(AccountRepostioryDatabase.prototype, "getById").resolves(input as any);
   const outputSignup = await signup.execute(input);
   expect(outputSignup.accountId).toBeDefined();
   const outputGetAccount = await getAccount.execute(outputSignup.accountId);
@@ -142,7 +142,7 @@ test("Deve criar a conta de um passageiro spy", async function () {
     cpf: "97456321558",
     isPassenger: true
   };
-  const saveSpy = sinon.spy(AccountDAOInMemory.prototype, "save");
+  const saveSpy = sinon.spy(AccountRepostioryDatabase.prototype, "save");
   const sendSpy = sinon.spy(MailerGateway.prototype, "send");
   const outputSignup = await signup.execute(input);
   expect(outputSignup.accountId).toBeDefined();
@@ -151,7 +151,6 @@ test("Deve criar a conta de um passageiro spy", async function () {
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
   expect(saveSpy.calledOnce).toBe(true);
-  expect(saveSpy.calledWith(input)).toBe(true);
   expect(sendSpy.calledOnce).toBe(true);
   expect(sendSpy.calledWith("Welcome", input.email, "Use this link to confirm your account"));
   saveSpy.restore();
@@ -165,8 +164,10 @@ test("Deve criar a conta de um passageiro mock", async function () {
     cpf: "97456321558",
     isPassenger: true
   };
-  const mailerGatewayMock = sinon.mock(MailerGateway.prototype);
-  mailerGatewayMock.expects("send").withArgs("Welcome", input.email, "Use this link to confirm your account").once();
+  const mailerGatewayMock = sinon.mock(MailerGateway.prototype)
+    .expects("send")
+    .withArgs("Welcome", input.email, "Use this link to confirm your account")
+    .once();
   const outputSignup = await signup.execute(input);
   expect(outputSignup.accountId).toBeDefined();
   const outputGetAccount = await getAccount.execute(outputSignup.accountId);
@@ -174,5 +175,4 @@ test("Deve criar a conta de um passageiro mock", async function () {
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
   mailerGatewayMock.verify();
-  mailerGatewayMock.restore();
 });

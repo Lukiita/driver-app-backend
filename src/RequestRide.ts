@@ -1,30 +1,39 @@
-import { AccountDAO } from './AccountDAO';
-import { RideDAO } from './RideDAO';
+import { AccountRepository } from './AccountRepository';
+import { Ride } from './Ride';
+import { RideRepository } from './RideRepository';
 
 export class RequestRide {
   constructor(
-    private readonly rideDAO: RideDAO,
-    private readonly accountDao: AccountDAO,
+    private readonly rideRepository: RideRepository,
+    private readonly accountRepostiory: AccountRepository,
   ) { }
 
-  async execute(input: any) {
-    const passenger = await this.accountDao.getById(input.passengerId);
-    if (!passenger.isPassenger) {
-      throw new Error('User is not a passenger.');
-    }
+  async execute(input: Input): Promise<Output> {
+    const ride = Ride.create(input.passengerId, input.fromLat, input.fromLong, input.toLat, input.toLong);
+    console.log('RIDE', ride);
+    const account = await this.accountRepostiory.getById(input.passengerId);
+    if (!account) throw new Error('User not registered.');
 
-    const rides: any[] = await this.rideDAO.getIncompletedByPassengerId(input.passengerId);
-    if (rides.length > 0) {
-      throw new Error('Passenger already has a ride in progress.');
-    }
+    if (!account.isPassenger) throw new Error('User is not a passenger.');
 
-    input.rideId = crypto.randomUUID();
-    input.status = 'requested';
-    input.date = new Date();
+    const rides: any[] = await this.rideRepository.getActiveRidesByPassengerId(input.passengerId);
+    if (rides.length > 0) throw new Error('Passenger already has a ride in progress.');
 
-    await this.rideDAO.save(input);
+    await this.rideRepository.save(ride);
     return {
-      rideId: input.rideId,
+      rideId: ride.rideId,
     }
   }
+}
+
+type Input = {
+  passengerId: string;
+  fromLat: number;
+  fromLong: number;
+  toLat: number;
+  toLong: number;
+}
+
+type Output = {
+  rideId: string;
 }

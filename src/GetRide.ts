@@ -1,16 +1,22 @@
-import { RideDAO } from './RideDAO';
+import { RideRepository } from './RideRepository';
 
 export class GetRide {
-  constructor(private rideDAO: RideDAO) { }
+  constructor(private rideDAO: RideRepository) { }
 
-  async execute(accountId: string) {
+  async execute(accountId: string): Promise<Output> {
     const ride = await this.rideDAO.getById(accountId);
-    ride.passengerId = ride.passenger_id;
-    ride.driverId = ride.driver_id;
-    ride.fromLat = ride.from_lat;
-    ride.fromLong = ride.from_long;
-    ride.toLat = ride.to_lat;
-    ride.toLong = ride.to_long;
+    if (!ride) throw new Error('Ride does not exist');
     return ride;
   }
+}
+
+type Output = {
+  passengerId: string;
+  rideId: string;
+  fromLat: number;
+  fromLong: number;
+  toLat: number;
+  toLong: number;
+  date: Date;
+  status: string;
 }

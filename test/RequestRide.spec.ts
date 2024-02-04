@@ -1,7 +1,7 @@
-import { AccountDAOInMemory } from '../src/AccountDAO';
+import { AccountRepostioryDatabase } from '../src/AccountRepository';
 import { GetRide } from '../src/GetRide';
 import { RequestRide } from '../src/RequestRide';
-import { RideDaoInMemory } from '../src/RideDAO';
+import { RideRepositoryDatabase } from '../src/RideRepository';
 import { Signup } from '../src/Signup';
 
 let requestRide: RequestRide;
@@ -9,8 +9,8 @@ let getRide: GetRide;
 let signup: Signup;
 
 beforeEach(() => {
-  const accountDAO = new AccountDAOInMemory();
-  const rideDao = new RideDaoInMemory();
+  const accountDAO = new AccountRepostioryDatabase();
+  const rideDao = new RideRepositoryDatabase();
   requestRide = new RequestRide(rideDao, accountDAO);
   signup = new Signup(accountDAO);
   getRide = new GetRide(rideDao);
@@ -28,10 +28,10 @@ test('Não deve solicitar a corrida se o usuário não for um passageiro', async
   const outputSignup = await signup.execute(inputSignup);
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    from_lat: 13214,
-    from_long: 123213,
-    to_lat: 13214,
-    to_long: 123213,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476
   }
 
   await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error('User is not a passenger.'));
@@ -49,25 +49,25 @@ test('Deve solicitar a corrida corretamente', async () => {
 
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    from_lat: 13214,
-    from_long: 123213,
-    to_lat: 13214,
-    to_long: 123213,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476
   }
 
   const outputRequestRide = await requestRide.execute(inputRequestRide);
 
   const ride = await getRide.execute(outputRequestRide.rideId);
-  expect(ride.passenger_id).toBe(inputRequestRide.passengerId);
-  expect(ride.from_lat).toBe(inputRequestRide.from_lat);
-  expect(ride.from_long).toBe(inputRequestRide.from_long);
-  expect(ride.to_lat).toBe(inputRequestRide.to_lat);
-  expect(ride.to_long).toBe(inputRequestRide.to_long);
+  expect(ride.passengerId).toBe(inputRequestRide.passengerId);
+  expect(ride.fromLat).toBe(inputRequestRide.fromLat);
+  expect(ride.fromLong).toBe(inputRequestRide.fromLong);
+  expect(ride.toLat).toBe(inputRequestRide.toLat);
+  expect(ride.toLong).toBe(inputRequestRide.toLong);
   expect(ride.status).toBe('requested');
   expect(ride.date).toBeInstanceOf(Date);
 });
 
-test.only('Não deve solicitar a corrida se o usuário já estiver uma conta ativa', async () => {
+test('Não deve solicitar a corrida se o usuário já estiver uma conta ativa', async () => {
   const inputSignup = {
     name: 'Lucas Fernandes',
     email: `lucas.lima${Math.random()}@gmail.com`,
@@ -79,10 +79,10 @@ test.only('Não deve solicitar a corrida se o usuário já estiver uma conta ati
 
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    from_lat: 13214,
-    from_long: 123213,
-    to_lat: 13214,
-    to_long: 123213,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476
   }
 
   await requestRide.execute(inputRequestRide);
