@@ -1,8 +1,8 @@
-import { GetAccount } from './GetAccount';
-import { GetRide } from './GetRide';
+import { GetAccount } from '../../application/usecase/GetAccount';
+import { GetRide } from '../../application/usecase/GetRide';
+import { RequestRide } from '../../application/usecase/RequestRide';
+import { Signup } from '../../application/usecase/Signup';
 import { HttpServer } from './HttpServer';
-import { RequestRide } from './RequestRide';
-import { Signup } from './Signup';
 
 export class MainController {
   constructor(

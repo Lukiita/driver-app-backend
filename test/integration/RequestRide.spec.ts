@@ -1,9 +1,10 @@
-import { AccountRepostioryDatabase } from '../src/AccountRepository';
-import { DatabaseConnection, PgPromiseAdapter } from '../src/DatabaseConnections';
-import { GetRide } from '../src/GetRide';
-import { RequestRide } from '../src/RequestRide';
-import { RideRepositoryDatabase } from '../src/RideRepository';
-import { Signup } from '../src/Signup';
+import { GetRide } from '../../src/application/usecase/GetRide';
+import { RequestRide } from '../../src/application/usecase/RequestRide';
+import { Signup } from '../../src/application/usecase/Signup';
+import { DatabaseConnection, PgPromiseAdapter } from '../../src/infra/database/DatabaseConnections';
+import MailerGateway from '../../src/infra/gateway/MailerGateway';
+import { AccountRepostioryDatabase } from '../../src/infra/repository/AccountRepository';
+import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository';
 
 let connection: DatabaseConnection;
 let requestRide: RequestRide;
@@ -14,8 +15,12 @@ beforeEach(() => {
   connection = new PgPromiseAdapter();
   const accountRepository = new AccountRepostioryDatabase(connection);
   const rideRepository = new RideRepositoryDatabase(connection);
+  const mailerGateway: MailerGateway = {
+    async send(subject: string, recipient: string, message: string): Promise<void> {
+    }
+  }
   requestRide = new RequestRide(rideRepository, accountRepository);
-  signup = new Signup(accountRepository);
+  signup = new Signup(accountRepository, mailerGateway);
   getRide = new GetRide(rideRepository, accountRepository);
 });
 
