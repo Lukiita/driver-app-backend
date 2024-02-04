@@ -1,5 +1,5 @@
-import pgp from "pg-promise";
 import { Account } from './Account';
+import { DatabaseConnection } from './DatabaseConnections';
 
 export interface AccountRepository {
   save(account: Account): Promise<void>;
@@ -8,16 +8,15 @@ export interface AccountRepository {
 }
 
 export class AccountRepostioryDatabase implements AccountRepository {
+
+  constructor(private readonly connection: DatabaseConnection) { }
+
   async save(account: Account) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    await connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.name, account.email, account.cpf, account.carPlate, !!account.isPassenger, !!account.isDriver]);
-    await connection.$pool.end();
+    await this.connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.name, account.email, account.cpf, account.carPlate, !!account.isPassenger, !!account.isDriver]);
   }
 
   async getByEmail(email: string) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [account] = await connection.query("select * from cccat15.account where email = $1", [email]);
-    await connection.$pool.end();
+    const [account] = await this.connection.query("select * from cccat15.account where email = $1", [email]);
     if (!account) return;
     return Account.restore(
       account.account_id,
@@ -31,9 +30,7 @@ export class AccountRepostioryDatabase implements AccountRepository {
   }
 
   async getById(accountId: string) {
-    const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-    const [account] = await connection.query("select * from cccat15.account where account_id = $1", [accountId]);
-    await connection.$pool.end();
+    const [account] = await this.connection.query("select * from cccat15.account where account_id = $1", [accountId]);
     if (!account) return;
     return Account.restore(
       account.account_id,

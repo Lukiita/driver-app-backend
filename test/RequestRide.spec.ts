@@ -1,20 +1,25 @@
 import { AccountRepostioryDatabase } from '../src/AccountRepository';
+import { DatabaseConnection, PgPromiseAdapter } from '../src/DatabaseConnections';
 import { GetRide } from '../src/GetRide';
 import { RequestRide } from '../src/RequestRide';
 import { RideRepositoryDatabase } from '../src/RideRepository';
 import { Signup } from '../src/Signup';
 
+let connection: DatabaseConnection;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let signup: Signup;
 
 beforeEach(() => {
-  const accountRepository = new AccountRepostioryDatabase();
-  const rideRepository = new RideRepositoryDatabase();
+  connection = new PgPromiseAdapter();
+  const accountRepository = new AccountRepostioryDatabase(connection);
+  const rideRepository = new RideRepositoryDatabase(connection);
   requestRide = new RequestRide(rideRepository, accountRepository);
   signup = new Signup(accountRepository);
   getRide = new GetRide(rideRepository, accountRepository);
 });
+
+afterEach(async () => await connection.close());
 
 test('Não deve solicitar a corrida se o usuário não for um passageiro', async () => {
   const inputSignup = {

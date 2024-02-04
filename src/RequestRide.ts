@@ -10,7 +10,6 @@ export class RequestRide {
 
   async execute(input: Input): Promise<Output> {
     const ride = Ride.create(input.passengerId, input.fromLat, input.fromLong, input.toLat, input.toLong);
-    console.log('RIDE', ride);
     const account = await this.accountRepostiory.getById(input.passengerId);
     if (!account) throw new Error('User not registered.');
 

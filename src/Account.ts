@@ -20,6 +20,7 @@ export class Account {
   }
 
   private isInvalidName() {
+    console.log('NAME', this.name);
     return !this.name.match(/[a-zA-Z] [a-zA-Z]+/);
   }
 

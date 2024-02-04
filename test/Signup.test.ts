@@ -1,17 +1,21 @@
 import sinon from 'sinon';
 import { AccountRepostioryDatabase } from '../src/AccountRepository';
+import { DatabaseConnection, PgPromiseAdapter } from '../src/DatabaseConnections';
 import { GetAccount } from '../src/GetAccount';
 import MailerGateway from '../src/MailerGateway';
 import { Signup } from '../src/Signup';
 
+let connection: DatabaseConnection;
 let signup: Signup;
 let getAccount: GetAccount;
-
 beforeEach(() => {
-  const accountRepository = new AccountRepostioryDatabase();
+  connection = new PgPromiseAdapter();
+  const accountRepository = new AccountRepostioryDatabase(connection);
   signup = new Signup(accountRepository);
   getAccount = new GetAccount(accountRepository);
-})
+});
+
+afterEach(async () => await connection.close());
 
 test("Deve criar a conta de um passageiro", async function () {
   // given
