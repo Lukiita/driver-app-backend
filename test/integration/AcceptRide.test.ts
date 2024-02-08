@@ -50,7 +50,7 @@ test('Não deve solicitar a corrida se o usuário não for um passageiro', async
   await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error('User is not a passenger.'));
 });
 
-test.only('Deve aceitar uma corrida', async () => {
+test('Deve aceitar uma corrida', async () => {
   const inputSignupPassenger = {
     name: 'Lucas Fernandes',
     email: `lucas.lima${Math.random()}@gmail.com`,
@@ -108,5 +108,6 @@ test('Não deve solicitar a corrida se o usuário já estiver uma conta ativa', 
 
   await requestRide.execute(inputRequestRide);
 
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error('Passenger already has a ride in progress.'));
+  await expect(() => requestRide.execute(inputRequestRide))
+    .rejects.toThrow(new Error('Passenger already has a ride in progress.'));
 });
