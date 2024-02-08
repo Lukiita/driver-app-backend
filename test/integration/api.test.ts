@@ -37,7 +37,6 @@ test("Deve solicitar uma corrida", async function () {
   }
   const responseRequestRide = await axios.post('http://localhost:3000/request_ride', inputRequestRide);
   const outputRequestRide = responseRequestRide.data;
-  console.log('TESTEEEEE');
   expect(outputRequestRide.rideId).toBeDefined();
   const repopnseGetRide = await axios.get(`http://localhost:3000/rides/${outputRequestRide.rideId}`);
   const outputGetRide = repopnseGetRide.data;

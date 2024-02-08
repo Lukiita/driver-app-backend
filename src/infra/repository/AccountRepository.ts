@@ -1,4 +1,4 @@
-import { Account } from '../../domain/Account';
+import { Account } from '../../domain/entity/Account';
 import { DatabaseConnection } from '../database/DatabaseConnections';
 
 export interface AccountRepository {
@@ -12,7 +12,7 @@ export class AccountRepostioryDatabase implements AccountRepository {
   constructor(private readonly connection: DatabaseConnection) { }
 
   async save(account: Account) {
-    await this.connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.name, account.email, account.cpf, account.carPlate, !!account.isPassenger, !!account.isDriver]);
+    await this.connection.query("insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [account.accountId, account.getName(), account.getEmail(), account.getCpf(), account.getCarPlate(), !!account.isPassenger, !!account.isDriver]);
   }
 
   async getByEmail(email: string) {
@@ -52,7 +52,7 @@ export class AccountRepositoryInMemory implements AccountRepository {
   }
 
   async getByEmail(email: string): Promise<Account | undefined> {
-    return this.accounts.find(account => account.email === email);
+    return this.accounts.find(account => account.getEmail() === email);
   }
 
   async getById(accountId: string): Promise<Account | undefined> {

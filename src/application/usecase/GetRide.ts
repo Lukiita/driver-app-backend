@@ -11,14 +11,18 @@ export class GetRide {
     if (!passenger) throw new Error('Passenger does not exist');
     return {
       passengerId: ride.passengerId,
-      passengerName: passenger.name,
+      passengerName: passenger.getName(),
       rideId: ride.rideId,
-      fromLat: ride.fromLat,
-      fromLong: ride.fromLong,
-      toLat: ride.toLat,
-      toLong: ride.toLong,
-      status: ride.status,
+      fromLat: ride.getFromLat(),
+      fromLong: ride.getFromLong(),
+      toLat: ride.getToLat(),
+      toLong: ride.getToLong(),
+      status: ride.getStatus(),
+      lastLat: ride.getLastLat(),
+      lastLong: ride.getLastLong(),
+      distance: ride.getDistance(),
       date: ride.date,
+      driverId: ride.getDriverId(),
     };
   }
 }
@@ -32,5 +36,9 @@ type Output = {
   toLat: number;
   toLong: number;
   status: string;
+  lastLat: number;
+  lastLong: number;
+  distance: number;
   date: Date;
+  driverId?: string;
 }

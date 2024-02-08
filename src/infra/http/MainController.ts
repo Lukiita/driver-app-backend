@@ -23,7 +23,6 @@ export class MainController {
     });
 
     httpServer.register('post', '/request_ride', async (params: any, body: any) => {
-      console.log(body);
       const output = await requestRide.execute(body);
       return output;
     });
