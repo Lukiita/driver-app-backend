@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import DistanceCalculator from '../ds/DistanceCalculator';
 import { Coord } from '../vo/Coord';
 
+const PRICE_PER_KM = 2.1;
+
 export class Ride {
   private from: Coord;
   private to: Coord;
@@ -19,6 +21,7 @@ export class Ride {
     lastLat: number,
     lastLong: number,
     private distance: number,
+    private fare: number,
     private driverId?: string,
   ) {
     this.from = new Coord(fromLat, fromLong);
@@ -42,7 +45,8 @@ export class Ride {
       date,
       fromLat,
       fromLong,
-      0
+      0,
+      0,
     );
   }
 
@@ -58,6 +62,7 @@ export class Ride {
     lastLat: number,
     lastLong: number,
     distance: number,
+    fare: number,
     driverId?: string
   ) {
     return new Ride(
@@ -72,6 +77,7 @@ export class Ride {
       lastLat,
       lastLong,
       distance,
+      fare,
       driverId,
     );
   }
@@ -85,6 +91,12 @@ export class Ride {
   start() {
     if (this.status !== 'accepted') throw new Error('Invalid status.');
     this.status = 'in_progress';
+  }
+
+  finish() {
+    if (this.status !== 'in_progress') throw new Error('Invalid status.');
+    this.status = 'completed';
+    this.fare = this.distance * PRICE_PER_KM;
   }
 
   updatePosition(lat: number, long: number) {
@@ -128,5 +140,9 @@ export class Ride {
 
   getDistance() {
     return this.distance;
+  }
+
+  getFare() {
+    return this.fare;
   }
 }
